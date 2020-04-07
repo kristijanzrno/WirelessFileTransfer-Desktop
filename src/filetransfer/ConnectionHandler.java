@@ -1,4 +1,4 @@
-package sample;
+package filetransfer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -26,8 +26,6 @@ public class ConnectionHandler extends Thread{
 
     @Override
     public void run() {
-        //super.run();
-
         while(isRunning){
             try {
                 androidDevice = serverSocket.accept();
@@ -47,7 +45,6 @@ public class ConnectionHandler extends Thread{
                 String androidMessage = receiveMessage();
                 if(androidMessage !=null && !androidMessage.isEmpty())
                     System.out.println(androidMessage);
-                //sendMessage("");
             }
         }catch (IOException e){
             e.printStackTrace();

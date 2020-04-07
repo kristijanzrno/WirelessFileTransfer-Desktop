@@ -1,4 +1,4 @@
-package sample;
+package filetransfer;
 
 import javafx.event.ActionEvent;
 
