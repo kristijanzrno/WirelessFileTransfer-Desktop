@@ -20,5 +20,8 @@ public class Main extends Application {
         System.out.println("Waiting for connection...");
         ConnectionHandler connectionHandler = new ConnectionHandler();
         connectionHandler.start();
+        Discovery discovery = new Discovery(connectionHandler.getIP(), connectionHandler.getPort());
+        Thread discoveryThread = new Thread(discovery);
+        discoveryThread.start();
     }
 }

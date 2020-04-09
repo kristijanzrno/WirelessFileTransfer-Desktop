@@ -3,6 +3,7 @@ package filetransfer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -72,7 +73,16 @@ public class ConnectionHandler extends Thread{
         }
     }
 
-    public void stopConnection(){
+    public void stopConnection() {
         isRunning = false;
+    }
+
+    public String getIP() {
+        Inet4Address address = (Inet4Address) serverSocket.getInetAddress();
+        return serverSocket.getLocalSocketAddress().toString();
+    }
+
+    public String getPort() {
+        return String.valueOf(serverSocket.getLocalPort());
     }
 }
