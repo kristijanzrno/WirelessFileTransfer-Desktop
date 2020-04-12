@@ -16,7 +16,7 @@ public class Discovery implements Runnable {
     @Override
     public void run() {
         try {
-            DatagramSocket socket = new DatagramSocket(8888, InetAddress.getByName("0.0.0.0"));
+            DatagramSocket socket = new DatagramSocket(8899, InetAddress.getByName("0.0.0.0"));
             socket.setBroadcast(true);
             System.out.println("hey");
             while (isRunning) {
@@ -25,9 +25,11 @@ public class Discovery implements Runnable {
                 socket.receive(packet);
                 String message = new String(packet.getData()).trim();
                 if (message.equals("discovery")) {
+                    System.out.println("discovered");
                     String serverData = "disc_" + ip + "::" + port;
                     byte[] data = serverData.getBytes();
-                    DatagramPacket dataPacket = new DatagramPacket(data, data.length, packet.getAddress(), packet.getPort());
+                    DatagramPacket dataPacket = new DatagramPacket(data, data.length, packet.getAddress(), 23423);
+
                     socket.send(dataPacket);
                 }
             }
