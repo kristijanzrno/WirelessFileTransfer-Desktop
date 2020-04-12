@@ -18,18 +18,17 @@ public class Discovery implements Runnable {
         try {
             DatagramSocket socket = new DatagramSocket(8899, InetAddress.getByName("0.0.0.0"));
             socket.setBroadcast(true);
-            System.out.println("hey");
             while (isRunning) {
                 byte[] receiveBuffer = new byte[15000];
                 DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                 socket.receive(packet);
                 String message = new String(packet.getData()).trim();
-                if (message.equals("discovery")) {
-                    System.out.println("discovered");
+                System.out.println(message);
+                if (message.startsWith("discovery")) {
                     String serverData = "disc_" + ip + "::" + port;
+                    int mobileDevicePort = Integer.parseInt(message.split("@")[1]);
                     byte[] data = serverData.getBytes();
-                    DatagramPacket dataPacket = new DatagramPacket(data, data.length, packet.getAddress(), 23423);
-
+                    DatagramPacket dataPacket = new DatagramPacket(data, data.length, packet.getAddress(), mobileDevicePort);
                     socket.send(dataPacket);
                 }
             }
