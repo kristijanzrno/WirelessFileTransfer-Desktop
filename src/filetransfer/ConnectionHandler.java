@@ -77,10 +77,6 @@ public class ConnectionHandler extends Thread{
         isRunning = false;
     }
 
-    public String getIP() {
-        Inet4Address address = (Inet4Address) serverSocket.getInetAddress();
-        return serverSocket.getLocalSocketAddress().toString();
-    }
 
     public String getPort() {
         return String.valueOf(serverSocket.getLocalPort());
