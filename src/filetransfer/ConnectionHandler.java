@@ -54,11 +54,6 @@ public class ConnectionHandler extends Thread {
                         long fileSize = Long.parseLong(message[2]);
                         System.out.println("Receiving " + filename + "...");
                         receiveFile(filename, fileSize, input);
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         break;
                     case Constants.FILE_SEND_COMPLETE_MESSAGE:
                         break;
