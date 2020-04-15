@@ -6,6 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.util.Scanner;
+
 public class Main extends Application {
 
     @Override
@@ -23,5 +26,16 @@ public class Main extends Application {
         Discovery discovery = new Discovery("1.2.3.4", connectionHandler.getPort());
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
+
+        Scanner scanner = new Scanner(System.in);
+        String action = scanner.nextLine();
+        File file = new File("testing.png");
+        switch (action) {
+            case "sendFile":
+                connectionHandler.sendMessage(Constants.FILE_SEND_MESSAGE + Constants.DATA_SEPARATOR + 1);
+                connectionHandler.sendFile(Constants.FILE_NAME_MESSAGE + Constants.DATA_SEPARATOR + file.getName() + Constants.DATA_SEPARATOR + file.length(), file.getAbsolutePath());
+                break;
+
+        }
     }
 }
