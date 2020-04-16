@@ -1,6 +1,7 @@
 package filetransfer;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -165,5 +166,16 @@ public class ConnectionHandler extends Thread {
 
     public String getPort() {
         return String.valueOf(serverSocket.getLocalPort());
+    }
+
+    public String getDeviceName(){
+        String deviceName = "Unknown";
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            deviceName = address.getHostName();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return deviceName;
     }
 }

@@ -23,10 +23,10 @@ public class Main extends Application {
         System.out.println("Waiting for connection...");
         ConnectionHandler connectionHandler = new ConnectionHandler();
         connectionHandler.start();
-        Discovery discovery = new Discovery("1.2.3.4", connectionHandler.getPort());
+        Device device = new Device(connectionHandler.getDeviceName(), "1.2.3.4", connectionHandler.getPriority(), "available", "extrainfo");
+        Discovery discovery = new Discovery(device);
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
-
         Scanner scanner = new Scanner(System.in);
         String action = "";
         while (!action.equals("q")) {
@@ -42,4 +42,5 @@ public class Main extends Application {
             }
         }
     }
+
 }

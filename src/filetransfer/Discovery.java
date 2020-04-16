@@ -5,12 +5,10 @@ import java.net.*;
 public class Discovery implements Runnable {
 
     private boolean isRunning = true;
-    private String ip;
-    private String port;
+    private Device device;
 
-    public Discovery(String ip, String port) {
-        this.ip = ip;
-        this.port = port;
+    public Discovery(Device device) {
+        this.device = device;
     }
 
     @Override
@@ -25,7 +23,7 @@ public class Discovery implements Runnable {
                 String message = new String(packet.getData()).trim();
                 System.out.println(message);
                 if (message.startsWith("discovery")) {
-                    String serverData = "disc_" + ip + "::" + port;
+                    String serverData = "disc_" + device.getName() + "::" + device.getIp() + "::" + device.getPort();
                     int mobileDevicePort = Integer.parseInt(message.split("@")[1]);
                     byte[] data = serverData.getBytes();
                     DatagramPacket dataPacket = new DatagramPacket(data, data.length, packet.getAddress(), mobileDevicePort);
@@ -42,4 +40,5 @@ public class Discovery implements Runnable {
     public void stopRunning() {
         this.isRunning = false;
     }
+
 }
