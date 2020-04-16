@@ -28,14 +28,18 @@ public class Main extends Application {
         discoveryThread.start();
 
         Scanner scanner = new Scanner(System.in);
-        String action = scanner.nextLine();
-        File file = new File("testing.png");
-        switch (action) {
-            case "sendFile":
-                connectionHandler.sendMessage(Constants.FILE_SEND_MESSAGE + Constants.DATA_SEPARATOR + 1);
-                connectionHandler.sendFile(Constants.FILE_NAME_MESSAGE + Constants.DATA_SEPARATOR + file.getName() + Constants.DATA_SEPARATOR + file.length(), file.getAbsolutePath());
-                break;
+        String action = "";
+        while (!action.equals("q")) {
+            action = scanner.nextLine().split(":")[0];
+            File file = new File(scanner.nextLine().split(":")[1]);
+            System.out.println(action);
+            switch (action) {
+                case "sendFile":
+                    connectionHandler.sendMessage(Constants.FILE_SEND_MESSAGE + Constants.DATA_SEPARATOR + 1);
+                    connectionHandler.sendFile(Constants.FILE_NAME_MESSAGE + Constants.DATA_SEPARATOR + file.getName() + Constants.DATA_SEPARATOR + file.length(), file.getAbsolutePath());
+                    break;
 
+            }
         }
     }
 }
