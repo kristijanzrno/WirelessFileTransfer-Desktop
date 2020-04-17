@@ -8,4 +8,5 @@ public class Constants {
     public static final String FILE_SEND_COMPLETE_MESSAGE = "_complete";
     public static final String FILE_NAME_MESSAGE = "_filename";
     public static final String DATA_SEPARATOR = ":";
+    public static final String CONNECTION_TERMINATOR = "_terminate";
 }

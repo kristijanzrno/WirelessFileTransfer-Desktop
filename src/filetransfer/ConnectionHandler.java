@@ -23,6 +23,11 @@ public class ConnectionHandler extends Thread {
 
     public ConnectionHandler(DiscoveryUtils discoveryUtils) {
         this.discoveryUtils = discoveryUtils;
+        this.actions = new LinkedList<>();
+        createSocket();
+    }
+
+    private void createSocket() {
         try {
             SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
             serverSocket = sslServerSocketFactory.createServerSocket(port);
@@ -30,64 +35,66 @@ public class ConnectionHandler extends Thread {
             e.printStackTrace();
             isRunning = false;
         }
-        this.actions = new LinkedList<>();
     }
 
     @Override
     public void run() {
-        while (isRunning) {
+        while (true) {
             try {
                 androidDevice = serverSocket.accept();
-                if (androidDevice != null)
-                    break;
+                //if (androidDevice != null)
+                //   break;
             } catch (IOException e) {
                 e.printStackTrace();
                 isRunning = false;
             }
-        }
-        System.out.println("Connected...");
-        discoveryUtils.changeStatus(true);
-        try {
-            input = new DataInputStream(androidDevice.getInputStream());
-            output = new DataOutputStream(androidDevice.getOutputStream());
+            System.out.println("Connected...");
+            discoveryUtils.changeStatus(true);
+            try {
+                input = new DataInputStream(androidDevice.getInputStream());
+                output = new DataOutputStream(androidDevice.getOutputStream());
 
-            while (isRunning) {
-                // SENDING
-                String receivedData = receiveMessage();
-                String[] message = receivedData.split(Constants.DATA_SEPARATOR);
-                switch (message[0]) {
-                    case Constants.FILE_SEND_MESSAGE:
-                        System.out.println("Preparing to receive data. Receiving " + message[1] + " items.");
-                        break;
-                    case Constants.FILE_NAME_MESSAGE:
-                        String filename = message[1];
-                        long fileSize = Long.parseLong(message[2]);
-                        System.out.println("Receiving " + filename + "...");
-                        receiveFile(filename, fileSize, input);
-                        break;
-                    case Constants.FILE_SEND_COMPLETE_MESSAGE:
-                        break;
-                }
-                // RECEIVING
-                Action action = actions.poll();
-                if (action != null) {
-                    switch (action.getAction()) {
-                        case "send_message":
-                            writeMessage(action.getMessage());
+                while (isRunning) {
+                    // SENDING
+                    String receivedData = receiveMessage();
+                    String[] message = receivedData.split(Constants.DATA_SEPARATOR);
+                    switch (message[0]) {
+                        case Constants.FILE_SEND_MESSAGE:
+                            System.out.println("Preparing to receive data. Receiving " + message[1] + " items.");
                             break;
-                        case "send_file":
-                            writeMessage(action.getMessage());
-                            writeFile(action.getFilePath());
+                        case Constants.FILE_NAME_MESSAGE:
+                            String filename = message[1];
+                            long fileSize = Long.parseLong(message[2]);
+                            System.out.println("Receiving " + filename + "...");
+                            receiveFile(filename, fileSize, input);
+                            break;
+                        case Constants.FILE_SEND_COMPLETE_MESSAGE:
+                            break;
+                        case Constants.CONNECTION_TERMINATOR:
+                            stopConnection();
                             break;
                     }
-                } else {
-                    writeMessage("");
+                    // RECEIVING
+                    Action action = actions.poll();
+                    if (action != null) {
+                        switch (action.getAction()) {
+                            case "send_message":
+                                writeMessage(action.getMessage());
+                                break;
+                            case "send_file":
+                                writeMessage(action.getMessage());
+                                writeFile(action.getFilePath());
+                                break;
+                        }
+                    } else {
+                        writeMessage("");
+                    }
+
+
                 }
-
-
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -165,8 +172,10 @@ public class ConnectionHandler extends Thread {
     }
 
     public void stopConnection() {
+        sendMessage(Constants.CONNECTION_TERMINATOR);
         isRunning = false;
         discoveryUtils.changeStatus(false);
+        createSocket();
     }
 
 
@@ -179,10 +188,19 @@ public class ConnectionHandler extends Thread {
         try {
             InetAddress address = InetAddress.getLocalHost();
             deviceName = address.getHostName();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         deviceName = deviceName.replace(".local", "");
         return deviceName;
     }
+
+    private void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                stopConnection();
+            }
+        });
+    }
+
 }
