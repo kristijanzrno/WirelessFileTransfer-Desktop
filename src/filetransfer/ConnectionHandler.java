@@ -14,17 +14,18 @@ public class ConnectionHandler extends Thread {
     private int port = 9270;
     private boolean isRunning = true;
     private boolean receiving;
+    private DiscoveryUtils discoveryUtils;
 
     DataInputStream input = null;
     DataOutputStream output = null;
 
     private Queue<Action> actions;
 
-    public ConnectionHandler() {
+    public ConnectionHandler(DiscoveryUtils discoveryUtils) {
+        this.discoveryUtils = discoveryUtils;
         try {
             SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
             serverSocket = sslServerSocketFactory.createServerSocket(port);
-            //serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             e.printStackTrace();
             isRunning = false;
@@ -45,6 +46,7 @@ public class ConnectionHandler extends Thread {
             }
         }
         System.out.println("Connected...");
+        discoveryUtils.changeStatus(true);
         try {
             input = new DataInputStream(androidDevice.getInputStream());
             output = new DataOutputStream(androidDevice.getOutputStream());
@@ -164,6 +166,7 @@ public class ConnectionHandler extends Thread {
 
     public void stopConnection() {
         isRunning = false;
+        discoveryUtils.changeStatus(false);
     }
 
 
@@ -179,6 +182,7 @@ public class ConnectionHandler extends Thread {
         }catch (Exception e){
             e.printStackTrace();
         }
+        deviceName = deviceName.replace(".local", "");
         return deviceName;
     }
 }
