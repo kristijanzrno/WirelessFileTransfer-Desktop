@@ -1,5 +1,6 @@
 package filetransfer;
 
+import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,7 +21,9 @@ public class ConnectionHandler extends Thread {
 
     public ConnectionHandler() {
         try {
-            serverSocket = new ServerSocket(port);
+            SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            serverSocket = sslServerSocketFactory.createServerSocket(port);
+            //serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             e.printStackTrace();
             isRunning = false;

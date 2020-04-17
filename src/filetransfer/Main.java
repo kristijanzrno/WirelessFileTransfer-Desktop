@@ -20,6 +20,9 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        System.setProperty("javax.net.ssl.keyStore", "server.ks");
+        System.setProperty("javax.net.ssl.keyStorePassword", "server");
+        System.setProperty("javax.net.ssl.keyStoreType", "JKS");
         System.out.println("Waiting for connection...");
         ConnectionHandler connectionHandler = new ConnectionHandler();
         connectionHandler.start();
