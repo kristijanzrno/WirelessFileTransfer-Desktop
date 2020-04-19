@@ -55,7 +55,7 @@ public class ConnectionHandler extends Thread {
                 output = new DataOutputStream(androidDevice.getOutputStream());
 
                 while (isRunning) {
-                    // SENDING
+                    // RECEIVING
                     String receivedData = receiveMessage();
                     String[] message = receivedData.split(Constants.DATA_SEPARATOR);
                     switch (message[0]) {
@@ -67,8 +67,9 @@ public class ConnectionHandler extends Thread {
                             long fileSize = Long.parseLong(message[2]);
                             System.out.println("Receiving " + filename + "...");
                             receiveFile(filename, fileSize, input);
+
                             break;
-                        case Constants.FILE_SEND_COMPLETE_MESSAGE:
+                        case Constants.FILE_RECEIVED:
                             break;
                         case Constants.CONNECTION_TERMINATOR:
                             stopConnection();
@@ -78,7 +79,7 @@ public class ConnectionHandler extends Thread {
                             acceptConnection();
                             break;
                     }
-                    // RECEIVING
+                    // SENDING
                     Action action = actions.poll();
                     if (action != null) {
                         switch (action.getAction()) {
@@ -135,7 +136,7 @@ public class ConnectionHandler extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("done...");
+
     }
 
 
@@ -172,6 +173,7 @@ public class ConnectionHandler extends Thread {
         }
         receiving = false;
         System.out.println("done....");
+        sendMessage(Constants.FILE_RECEIVED);
         return true;
     }
 
