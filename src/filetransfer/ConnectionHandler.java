@@ -73,6 +73,10 @@ public class ConnectionHandler extends Thread {
                         case Constants.CONNECTION_TERMINATOR:
                             stopConnection();
                             break;
+                        case Constants.CONNECTION_REQUEST:
+                            //todo accept/refuse
+                            acceptConnection();
+                            break;
                     }
                     // RECEIVING
                     Action action = actions.poll();
@@ -178,12 +182,20 @@ public class ConnectionHandler extends Thread {
         createSocket();
     }
 
+    public void acceptConnection() {
+        sendMessage(Constants.CONNECTION_ACCEPTED);
+    }
+
+    public void refuseConnection() {
+        sendMessage(Constants.CONNECTION_REFUSED);
+    }
+
 
     public String getPort() {
         return String.valueOf(serverSocket.getLocalPort());
     }
 
-    public String getDeviceName(){
+    public String getDeviceName() {
         String deviceName = "Unknown";
         try {
             InetAddress address = InetAddress.getLocalHost();
