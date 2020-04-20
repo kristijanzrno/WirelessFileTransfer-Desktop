@@ -13,13 +13,14 @@ public class ConnectionHandler extends Thread {
     private Socket androidDevice;
     private int port = 9270;
     private boolean isRunning = true;
-    private boolean receiving;
     private DiscoveryUtils discoveryUtils;
 
     DataInputStream input = null;
     DataOutputStream output = null;
 
     private Queue<Action> actions;
+
+    private boolean test = true;
 
     public ConnectionHandler(DiscoveryUtils discoveryUtils) {
         this.discoveryUtils = discoveryUtils;
@@ -77,6 +78,7 @@ public class ConnectionHandler extends Thread {
                                 System.out.println("Receiving " + filename + "...");
                                 if (!receiveFile(filename, fileSize, input))
                                     sendMessage(new Message.Builder().add(Constants.FILE_TRANSFER_ERROR).add(filename).build());
+                                else sendMessage(Constants.FILE_RECEIVED);
                                 break;
                             case Constants.FILE_RECEIVED:
                                 break;
@@ -158,7 +160,6 @@ public class ConnectionHandler extends Thread {
     }
 
     private boolean receiveFile(String filename, long fileSize, InputStream inputStream) {
-        receiving = true;
         File file = new File(filename);
         System.out.println("receiving....");
         try {
@@ -176,10 +177,9 @@ public class ConnectionHandler extends Thread {
             e.printStackTrace();
             return false;
         }
-        receiving = false;
         System.out.println("done....");
-        sendMessage(Constants.FILE_RECEIVED);
-        return true;
+        test = !test;
+        return test;
     }
 
     public void stopConnection() {
