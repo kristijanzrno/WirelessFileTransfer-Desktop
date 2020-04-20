@@ -42,64 +42,74 @@ public class ConnectionHandler extends Thread {
         while (true) {
             try {
                 androidDevice = serverSocket.accept();
-                //if (androidDevice != null)
-                //   break;
             } catch (IOException e) {
                 e.printStackTrace();
                 isRunning = false;
             }
             System.out.println("Connected...");
             discoveryUtils.changeStatus(true);
+
             try {
                 input = new DataInputStream(androidDevice.getInputStream());
                 output = new DataOutputStream(androidDevice.getOutputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+                isRunning = false;
+            }
 
                 while (isRunning) {
                     // RECEIVING
-                    String receivedData = receiveMessage();
-                    String[] message = receivedData.split(Constants.DATA_SEPARATOR);
-                    switch (message[0]) {
-                        case Constants.FILE_SEND_MESSAGE:
-                            System.out.println("Preparing to receive data. Receiving " + message[1] + " items.");
-                            break;
-                        case Constants.FILE_NAME_MESSAGE:
-                            String filename = message[1];
-                            long fileSize = Long.parseLong(message[2]);
-                            System.out.println("Receiving " + filename + "...");
-                            receiveFile(filename, fileSize, input);
+                    Message receivedMessage = null;
+                    try {
+                        receivedMessage = receiveMessage();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-                            break;
-                        case Constants.FILE_RECEIVED:
-                            break;
-                        case Constants.CONNECTION_TERMINATOR:
-                            stopConnection();
-                            break;
-                        case Constants.CONNECTION_REQUEST:
-                            //todo accept/refuse
-                            acceptConnection();
-                            break;
+                    if (receivedMessage != null) {
+                        switch (receivedMessage.getAction()) {
+                            case Constants.FILE_SEND_MESSAGE:
+                                System.out.println("Preparing to receive data. Receiving " + receivedMessage.paramAt(0) + " items.");
+                                break;
+                            case Constants.FILE_NAME_MESSAGE:
+                                String filename = receivedMessage.paramAt(0);
+                                long fileSize = Long.parseLong(receivedMessage.paramAt(1));
+                                System.out.println("Receiving " + filename + "...");
+                                if (!receiveFile(filename, fileSize, input))
+                                    sendMessage(new Message.Builder().add(Constants.FILE_TRANSFER_ERROR).add(filename).build());
+                                break;
+                            case Constants.FILE_RECEIVED:
+                                break;
+                            case Constants.CONNECTION_TERMINATOR:
+                                stopConnection();
+                                break;
+                            case Constants.CONNECTION_REQUEST:
+                                //todo accept/refuse
+                                acceptConnection();
+                                break;
+                        }
                     }
                     // SENDING
                     Action action = actions.poll();
-                    if (action != null) {
-                        switch (action.getAction()) {
-                            case "send_message":
-                                writeMessage(action.getMessage());
-                                break;
-                            case "send_file":
-                                writeMessage(action.getMessage());
-                                writeFile(action.getFilePath());
-                                break;
+                    try {
+                        if (action != null) {
+                            switch (action.getAction()) {
+                                case "send_message":
+                                    writeMessage(action.getMessage());
+                                    break;
+                                case "send_file":
+                                    writeMessage(action.getMessage());
+                                    writeFile(action.getFilePath());
+                                    break;
+                            }
+                        } else {
+                            writeMessage("");
                         }
-                    } else {
-                        writeMessage("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
                     }
-
-
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -140,16 +150,11 @@ public class ConnectionHandler extends Thread {
     }
 
 
-    private String receiveMessage() {
+    private Message receiveMessage() throws IOException {
         if (input != null) {
-            try {
-                return input.readUTF();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "Could not read data";
-            }
+            return new Message(input.readUTF());
         }
-        return "";
+        return null;
     }
 
     private boolean receiveFile(String filename, long fileSize, InputStream inputStream) {

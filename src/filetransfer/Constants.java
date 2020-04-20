@@ -4,16 +4,22 @@ public class Constants {
     // DESKTOP SPECIFIC CONSTANTS
 
     public static final int FILE_PICKER_REQUEST = 4;
+    public static final int FILE_TRANSFER_ACTIVITY_REQUEST = 5;
+
     public static final String FILE_SEND_MESSAGE = "_transferring";
     public static final String FILE_NAME_MESSAGE = "_filename";
     public static final String FILE_RECEIVED = "_received";
+    public static final String FILE_TRANSFER_ERROR = "_error";
     public static final String DATA_SEPARATOR = ":";
     public static final String CONNECTION_TERMINATOR = "_terminate";
     public static final String CONNECTION_REQUEST = "_connect";
     public static final String CONNECTION_ACCEPTED = "_accepted";
     public static final String CONNECTION_REFUSED = "_refused";
 
+    public static final String DISCOVERY_BROADCAST = "discovery@";
+    public static final String DEVICE_DISCOVERED = "_disc";
 
+    // ANDROID SPECIFIC CONSTANTS
     // Network Broadcasts
     public static final int BROADCAST_WAIT_TIME = 3000;
     // Shared Preferences Keys
