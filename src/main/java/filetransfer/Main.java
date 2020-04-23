@@ -1,5 +1,6 @@
 package filetransfer;
 
+import filetransfer.controllers.MainController;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -26,12 +27,12 @@ public class Main extends Application implements DiscoveryUtils {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //Parent root = FXMLLoader.load(getClass().getResource("/main_window.fxml"));
-        //primaryStage.setTitle("Hello World");
-        //primaryStage.setScene(new Scene(root, 300, 275));
-        //primaryStage.show();
+        Parent root = FXMLLoader.load(getClass().getResource("/main_window.fxml"));
+        primaryStage.setTitle("Hello World");
+        primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.show();
 
-        Main main = new Main();
+        /*Main main = new Main();
         main.create();
 
         Label label = new Label("Drag a file to me.");
@@ -44,7 +45,7 @@ public class Main extends Application implements DiscoveryUtils {
             public void handle(DragEvent event) {
                 if (event.getGestureSource() != dragTarget
                         && event.getDragboard().hasFiles()) {
-                    /* allow for both copying and moving, whatever user chooses */
+                    /* allow for both copying and moving, whatever user chooses
                     event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
                 }
                 event.consume();
@@ -63,7 +64,7 @@ public class Main extends Application implements DiscoveryUtils {
                     success = true;
                 }
                 /* let the source know whether the string was successfully
-                 * transferred and used */
+                 * transferred and used
                 event.setDropCompleted(success);
 
                 event.consume();
@@ -78,7 +79,7 @@ public class Main extends Application implements DiscoveryUtils {
 
         primaryStage.setTitle("Drag Test");
         primaryStage.setScene(scene);
-        primaryStage.show();
+        primaryStage.show();*/
     }
 
     public void create() {
@@ -124,9 +125,6 @@ public class Main extends Application implements DiscoveryUtils {
 
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
 
 }
