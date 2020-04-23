@@ -35,9 +35,10 @@
                                 <Label id="test" fx:id="deviceInfo" text="Device-Info" GridPane.rowIndex="1"/>
                                 <Label id="status" text="STATUS" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                                 <Button mnemonicParsing="false" text="Button" GridPane.columnIndex="2"
-                                        GridPane.rowIndex="1"/>
+                                        GridPane.rowIndex="1" onAction="#onQRButtonClicked"/>
                                 <Button mnemonicParsing="false" text="Button" GridPane.columnIndex="3"
-                                        GridPane.rowIndex="1"/>
+                                        GridPane.rowIndex="1"
+                                onAction="#onSettingsButtonClicked"/>
                             </children>
                         </GridPane>
                     </children>
