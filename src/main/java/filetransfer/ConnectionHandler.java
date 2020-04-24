@@ -13,7 +13,7 @@ public class ConnectionHandler extends Thread {
     private Socket androidDevice;
     private int port = 9270;
     private boolean isRunning = true;
-    private DiscoveryUtils discoveryUtils;
+    private NetworkHandlers networkHandlers;
 
     DataInputStream input = null;
     DataOutputStream output = null;
@@ -22,8 +22,8 @@ public class ConnectionHandler extends Thread {
 
     private boolean test = true;
 
-    public ConnectionHandler(DiscoveryUtils discoveryUtils) {
-        this.discoveryUtils = discoveryUtils;
+    public ConnectionHandler(NetworkHandlers networkHandlers) {
+        this.networkHandlers = networkHandlers;
         this.actions = new LinkedList<>();
         createSocket();
     }
@@ -48,7 +48,6 @@ public class ConnectionHandler extends Thread {
                 isRunning = false;
             }
             System.out.println("Connected...");
-            discoveryUtils.changeStatus(true);
 
             try {
                 input = new DataInputStream(androidDevice.getInputStream());
@@ -87,7 +86,9 @@ public class ConnectionHandler extends Thread {
                             break;
                         case Constants.CONNECTION_REQUEST:
                             //todo accept/refuse
-                            acceptConnection();
+                            Device device = new Device();
+                            device.setName(receivedMessage.paramAt(0));
+                            networkHandlers.onConnectionAttempted(device);
                             break;
                     }
                 }
@@ -184,7 +185,6 @@ public class ConnectionHandler extends Thread {
     public void stopConnection() {
         sendMessage(Constants.CONNECTION_TERMINATOR);
         isRunning = false;
-        discoveryUtils.changeStatus(false);
         createSocket();
     }
 
