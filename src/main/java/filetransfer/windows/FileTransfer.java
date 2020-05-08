@@ -3,6 +3,7 @@ package filetransfer.windows;
 
 import filetransfer.*;
 import filetransfer.controllers.MainController;
+import filetransfer.controllers.SettingsController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -23,7 +24,6 @@ import javafx.stage.Stage;
 import java.awt.image.BufferedImage;
 import java.net.Inet4Address;
 import java.util.Optional;
-import java.util.Scanner;
 
 public class FileTransfer extends Application implements MainUIHandler, DiscoveryUtils, NetworkHandlers {
 
@@ -32,6 +32,8 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     private Device device;
     private ConnectionHandler connectionHandler;
     private MainController mainController;
+    private SettingsController settingsController;
+
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -89,7 +91,20 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
 
     @Override
     public void onSettingsButtonClicked() {
-        System.out.println("settings clicked");
+        try {
+            System.out.println("Settings");
+            Stage stage = new Stage();
+            stage.setTitle("Settings");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/settings.fxml"));
+            Parent root = loader.load();
+            settingsController = loader.getController();
+            settingsController.initUIHandler(this);
+            stage.setScene(new Scene(root, 590, 600));
+            stage.setResizable(false);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void startServices(String hostAddress) {
@@ -103,8 +118,6 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         discovery = new Discovery(device);
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
-        Scanner scanner = new Scanner(System.in);
-        String action = "";
         mainController.setDeviceInfo(device);
 
     }
