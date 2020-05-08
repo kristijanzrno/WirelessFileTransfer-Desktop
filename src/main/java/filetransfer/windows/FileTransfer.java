@@ -1,17 +1,27 @@
 package filetransfer.windows;
 
+
 import filetransfer.*;
 import filetransfer.controllers.MainController;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.awt.image.BufferedImage;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -39,7 +49,40 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
 
     @Override
     public void onQRButtonClicked() {
-        System.out.println("qr clicked");
+        BufferedImage bufferedImage = QRUtils.generateQRCode(device.getIp(), 300, 300);
+        if (bufferedImage != null) {
+            Stage stage = new Stage();
+            stage.setTitle("QR Code");
+            stage.setResizable(false);
+            Pane root = new Pane();
+            Scene scene = new Scene(root, 350, 350);
+            root.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.rgb(255, 255, 255), CornerRadii.EMPTY, Insets.EMPTY)));
+
+            Label deviceName = new Label();
+            deviceName.setAlignment(Pos.CENTER);
+            deviceName.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
+            deviceName.setText(device.getName());
+            deviceName.setMinWidth(350);
+            deviceName.setLayoutY(10);
+            root.getChildren().add(deviceName);
+
+            Label guideMessage = new Label();
+            guideMessage.setAlignment(Pos.CENTER);
+            guideMessage.setFont(Font.font("Verdana", FontWeight.BOLD, 11));
+            guideMessage.setText("Scan the QR Code using the Android application");
+            guideMessage.setMinWidth(350);
+            guideMessage.setLayoutY(330);
+            root.getChildren().add(guideMessage);
+
+            ImageView imageView = new ImageView();
+            imageView.setLayoutX(25);
+            imageView.setLayoutY(25);
+            imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
+            root.getChildren().add(imageView);
+
+            stage.setScene(scene);
+            stage.show();
+        }
     }
 
     @Override
@@ -83,11 +126,9 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.get() == ButtonType.OK) {
                         connectionHandler.acceptConnection();
-                        // ... user chose OK
                     } else {
                         connectionHandler.refuseConnection();
                         status = false;
-                        // ... user chose CANCEL or closed the dialog
                     }
                 }
             });
