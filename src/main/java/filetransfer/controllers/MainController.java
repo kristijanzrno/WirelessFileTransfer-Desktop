@@ -42,15 +42,19 @@ public class MainController {
     }
 
     @FXML
-    private void onQRButtonClicked(){
+    private void onQRButtonClicked() {
         uiHandler.onQRButtonClicked();
     }
 
     @FXML
-    private void onSettingsButtonClicked(){
+    private void onSettingsButtonClicked() {
         uiHandler.onSettingsButtonClicked();
     }
 
+    @FXML
+    private void onDisconnectButtonClicked() {
+        uiHandler.onSettingsButtonClicked();
+    }
 
 
 }

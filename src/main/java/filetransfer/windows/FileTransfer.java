@@ -18,7 +18,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.awt.image.BufferedImage;
@@ -31,12 +30,13 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     private Discovery discovery;
     private Device device;
     private ConnectionHandler connectionHandler;
+    private MainController mainController;
 
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/main_window.fxml"));
         Parent root = loader.load();
-        MainController mainController = loader.getController();
+        mainController = loader.getController();
         mainController.initUIHandler(this);
         stage.setTitle("Wireless File Transfer");
         stage.setScene(new Scene(root, 810, 550));
@@ -103,6 +103,8 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         discoveryThread.start();
         Scanner scanner = new Scanner(System.in);
         String action = "";
+        mainController.setDeviceInfo(device);
+
     }
 
     @Override
