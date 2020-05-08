@@ -28,6 +28,7 @@ import java.util.Optional;
 public class FileTransfer extends Application implements MainUIHandler, DiscoveryUtils, NetworkHandlers {
 
     private boolean status = false;
+    private Preferences preferences;
     private Discovery discovery;
     private Device device;
     private ConnectionHandler connectionHandler;
@@ -47,7 +48,6 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         stage.show();
         String address = Inet4Address.getLocalHost().getHostAddress();
         startServices(address);
-
     }
 
     @Override
@@ -98,7 +98,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/settings.fxml"));
             Parent root = loader.load();
             settingsController = loader.getController();
-            settingsController.initUIHandler(this);
+            settingsController.initStage(stage, preferences);
             stage.setScene(new Scene(root, 590, 600));
             stage.setResizable(false);
             stage.show();
@@ -106,6 +106,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
             e.printStackTrace();
         }
     }
+
 
     private void startServices(String hostAddress) {
         System.setProperty("javax.net.ssl.keyStore", "server.ks");
@@ -116,6 +117,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         connectionHandler.start();
         device = new Device(connectionHandler.getDeviceName(), hostAddress, Integer.parseInt(connectionHandler.getPort()), "Available", System.getProperty("os.name"));
         discovery = new Discovery(device);
+        preferences = new Preferences();
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
         mainController.setDeviceInfo(device);

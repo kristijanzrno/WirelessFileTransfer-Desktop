@@ -11,6 +11,8 @@ public class Constants {
     public static final String FILE_RECEIVED = "_received";
     public static final String FILE_TRANSFER_ERROR = "_error";
     public static final String DATA_SEPARATOR = ":";
+    public static final String SETTINGS_SEPARATOR = "\n";
+
     public static final String CONNECTION_TERMINATOR = "_terminate";
     public static final String CONNECTION_REQUEST = "_connect";
     public static final String CONNECTION_ACCEPTED = "_accepted";
