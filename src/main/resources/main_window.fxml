@@ -27,7 +27,8 @@
                                 <Font name="System Font" size="16.0"/>
                             </font>
                         </Label>
-                        <Label id="status" layoutX="325.0" layoutY="23.0" text="Waiting for connection...">
+                        <Label id="status" fx:id="deviceStatus" layoutX="325.0" layoutY="23.0"
+                               text="Waiting for connection...">
                             <font>
                                 <Font name="System Bold Italic" size="16.0"/>
                             </font>
@@ -52,7 +53,7 @@
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button layoutX="637.0" layoutY="8.0" mnemonicParsing="false"
+                        <Button fx:id="disconnectButton" layoutX="637.0" layoutY="8.0" mnemonicParsing="false"
                                 onAction="#onDisconnectButtonClicked"
                                 style="-fx-background-color: #FFFFFF; -fx-border-color: #FFFFFF;">
                             <graphic>
@@ -65,9 +66,9 @@
                         </Button>
                     </children>
                 </Pane>
-                <Label alignment="CENTER" layoutX="246.0" layoutY="245.0" prefHeight="66.0" prefWidth="352.0"
-                       style="&#10;" text="Connect with a device to start transferring files!" textAlignment="CENTER"
-                       textFill="#9f9f9f" wrapText="false">
+                <Label fx:id="mainMessage" alignment="CENTER" layoutX="38.0" layoutY="245.0" prefHeight="66.0"
+                       prefWidth="748.0" style="&#10;" text="Connect with a device to start transferring files!"
+                       textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
                     <font>
                         <Font size="18.0"/>
                     </font>

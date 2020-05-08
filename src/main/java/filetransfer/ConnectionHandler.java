@@ -3,6 +3,7 @@ package filetransfer;
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -70,16 +71,25 @@ public class ConnectionHandler extends Thread {
                     switch (receivedMessage.getAction()) {
                         case Constants.FILE_SEND_MESSAGE:
                             System.out.println("Preparing to receive data. Receiving " + receivedMessage.paramAt(0) + " items.");
+                            networkHandlers.onReceivingFiles(Integer.parseInt(receivedMessage.paramAt(0)));
                             break;
                         case Constants.FILE_NAME_MESSAGE:
                             String filename = receivedMessage.paramAt(0);
                             long fileSize = Long.parseLong(receivedMessage.paramAt(1));
                             System.out.println("Receiving " + filename + "...");
-                            if (!receiveFile(filename, fileSize, input))
+                            if (!receiveFile(filename, fileSize, input)) {
                                 sendMessage(new Message.Builder().add(Constants.FILE_TRANSFER_ERROR).add(filename).build());
-                            else sendMessage(Constants.FILE_RECEIVED);
+                                networkHandlers.onFileTransferFailed(filename);
+                            } else {
+                                sendMessage(Constants.FILE_RECEIVED);
+                                networkHandlers.onFileReceived();
+                            }
                             break;
                         case Constants.FILE_RECEIVED:
+                            networkHandlers.onFileTransferred();
+                            break;
+                        case Constants.FILE_TRANSFER_ERROR:
+                            networkHandlers.onFileTransferFailed(receivedMessage.paramAt(0));
                             break;
                         case Constants.CONNECTION_TERMINATOR:
                             stopConnection();
@@ -188,6 +198,11 @@ public class ConnectionHandler extends Thread {
         createSocket();
     }
 
+    public void terminateConnection() {
+        sendMessage(Constants.CONNECTION_TERMINATOR);
+        networkHandlers.onConnectionTerminated();
+    }
+
     public void acceptConnection() {
         sendMessage(Constants.CONNECTION_ACCEPTED);
     }
@@ -196,6 +211,17 @@ public class ConnectionHandler extends Thread {
         sendMessage(Constants.CONNECTION_REFUSED);
     }
 
+
+    public String getIPAddress() {
+        Socket socket = new Socket();
+        try {
+            socket.connect(new InetSocketAddress("ntu.ac.uk", 80));
+            return socket.getLocalAddress().getHostAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 
     public String getPort() {
         return String.valueOf(serverSocket.getLocalPort());

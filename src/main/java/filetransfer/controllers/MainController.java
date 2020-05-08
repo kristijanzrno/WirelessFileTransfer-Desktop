@@ -20,24 +20,29 @@ public class MainController {
     private Button qrButton;
     @FXML
     private Button settingsButton;
+    @FXML
+    private Button disconnectButton;
 
     private MainUIHandler uiHandler;
 
-    public void initUIHandler(MainUIHandler uiHandler){
-        if(this.uiHandler == null)
+    public void initUIHandler(MainUIHandler uiHandler) {
+        if (this.uiHandler == null)
             this.uiHandler = uiHandler;
+        disconnectButton.setVisible(false);
     }
 
 
-    public void setDeviceMessage(String message){
+    public void setMainMessage(String message) {
         this.mainMessage.setText(message);
     }
-    public void setDeviceInfo(Device device){
+
+    public void setDeviceInfo(Device device) {
         this.deviceInfo.setText(device.getName());
     }
 
-    public void setDeviceStatus(boolean connected){
-        this.deviceStatus.setText(connected ? "Connected" : "Waiting for connection...");
+    public void setDeviceStatus(boolean connected, String deviceName) {
+        this.deviceStatus.setText(connected ? "Connected to " + deviceName : "Waiting for connection...");
+        this.disconnectButton.setVisible(connected);
     }
 
     @FXML
@@ -52,7 +57,7 @@ public class MainController {
 
     @FXML
     private void onDisconnectButtonClicked() {
-        uiHandler.onSettingsButtonClicked();
+        uiHandler.onDisconnectButtonClicked();
     }
 
 

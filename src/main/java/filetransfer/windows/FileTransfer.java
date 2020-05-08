@@ -30,10 +30,14 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     private boolean status = false;
     private Preferences preferences;
     private Discovery discovery;
-    private Device device;
+    private Device currentDevice, connectedDevice;
     private ConnectionHandler connectionHandler;
     private MainController mainController;
     private SettingsController settingsController;
+
+    private int noOfFiles = 0;
+    private int finished = 0;
+    private boolean hadErrors = false;
 
 
     @Override
@@ -47,12 +51,14 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         stage.setResizable(false);
         stage.show();
         String address = Inet4Address.getLocalHost().getHostAddress();
+        System.out.println(address);
+        System.out.println(Inet4Address.getLocalHost());
         startServices(address);
     }
 
     @Override
     public void onQRButtonClicked() {
-        String message = new Message.Builder().add(device.getName()).add(device.getIp()).add(device.getPort() + "").add(device.getAvailable()).add(device.getInfo()).build();
+        String message = new Message.Builder().add(currentDevice.getName()).add(currentDevice.getIp()).add(currentDevice.getPort() + "").add(currentDevice.getAvailable()).add(currentDevice.getInfo()).build();
         BufferedImage bufferedImage = QRUtils.generateQRCode(message, 300, 300);
         if (bufferedImage != null) {
             Stage stage = new Stage();
@@ -65,7 +71,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
             Label deviceName = new Label();
             deviceName.setAlignment(Pos.CENTER);
             deviceName.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
-            deviceName.setText(device.getName());
+            deviceName.setText(currentDevice.getName());
             deviceName.setMinWidth(350);
             deviceName.setLayoutY(10);
             root.getChildren().add(deviceName);
@@ -107,6 +113,12 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         }
     }
 
+    @Override
+    public void onDisconnectButtonClicked() {
+        //todo ask first
+        connectionHandler.terminateConnection();
+    }
+
 
     private void startServices(String hostAddress) {
         System.setProperty("javax.net.ssl.keyStore", "server.ks");
@@ -115,12 +127,12 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         System.out.println("Waiting for connection...");
         connectionHandler = new ConnectionHandler(this);
         connectionHandler.start();
-        device = new Device(connectionHandler.getDeviceName(), hostAddress, Integer.parseInt(connectionHandler.getPort()), "Available", System.getProperty("os.name"));
-        discovery = new Discovery(device);
+        currentDevice = new Device(connectionHandler.getDeviceName(), connectionHandler.getIPAddress(), Integer.parseInt(connectionHandler.getPort()), "Available", System.getProperty("os.name"));
+        discovery = new Discovery(currentDevice);
         preferences = new Preferences();
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
-        mainController.setDeviceInfo(device);
+        mainController.setDeviceInfo(currentDevice);
 
     }
 
@@ -137,7 +149,6 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("Connection Request");
                     alert.setContentText(request.getName() + " wants to connect...");
@@ -145,6 +156,8 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.get() == ButtonType.OK) {
                         connectionHandler.acceptConnection();
+                        connectedDevice = request;
+                        onDeviceConnected();
                     } else {
                         connectionHandler.refuseConnection();
                         status = false;
@@ -155,43 +168,82 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
 
     }
 
+    private void updateStatus(boolean increase) {
+        if (increase)
+            finished++;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                mainController.setMainMessage(finished + "/" + noOfFiles + "Files Transferred...");
+                if (noOfFiles == finished) {
+                    if (hadErrors) {
+                        //todo had some errors
+                    } else {
+                        // todo message = success
+                        mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
+                    }
+                    noOfFiles = finished = 0;
+                    //todo spinner dismiss
+                }
+            }
+        });
+    }
+
     @Override
     public void onDeviceConnected() {
+        if (connectedDevice != null) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    mainController.setDeviceStatus(true, connectedDevice.getName());
+                    mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
+                }
+            });
 
+        }
     }
 
     @Override
     public void onConnectionRefused() {
-
+        // currently impossible as the connection establishment is one-directional, future work
     }
 
     @Override
     public void onConnectionTerminated() {
-
+        mainController.setDeviceStatus(false, "");
+        mainController.setMainMessage("Connect with a device to start transferring files!");
+        connectedDevice = null;
+        noOfFiles = finished = 0;
+        hadErrors = false;
     }
 
     @Override
     public void onFileTransferStarted(int noOfFiles) {
-
+        this.hadErrors = false;
+        this.noOfFiles = noOfFiles;
+        updateStatus(false);
     }
 
     @Override
     public void onFileTransferred() {
-
+        updateStatus(true);
     }
 
     @Override
     public void onFileTransferFailed(String filename) {
-
+        this.hadErrors = true;
+        updateStatus(true);
     }
 
     @Override
     public void onReceivingFiles(int noOfFiles) {
-
+        this.noOfFiles = noOfFiles;
+        updateStatus(false);
     }
 
     @Override
     public void onFileReceived() {
+        updateStatus(true);
 
     }
 
