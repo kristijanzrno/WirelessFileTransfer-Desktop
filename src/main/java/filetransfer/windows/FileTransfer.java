@@ -21,6 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.awt.image.BufferedImage;
+import java.net.Inet4Address;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -42,14 +43,15 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         stage.setScene(new Scene(root, 810, 550));
         stage.setResizable(false);
         stage.show();
-
-        startServices();
+        String address = Inet4Address.getLocalHost().getHostAddress();
+        startServices(address);
 
     }
 
     @Override
     public void onQRButtonClicked() {
-        BufferedImage bufferedImage = QRUtils.generateQRCode(device.getIp(), 300, 300);
+        String message = new Message.Builder().add(device.getName()).add(device.getIp()).add(device.getPort() + "").add(device.getAvailable()).add(device.getInfo()).build();
+        BufferedImage bufferedImage = QRUtils.generateQRCode(message, 300, 300);
         if (bufferedImage != null) {
             Stage stage = new Stage();
             stage.setTitle("QR Code");
@@ -90,14 +92,14 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         System.out.println("settings clicked");
     }
 
-    private void startServices() {
+    private void startServices(String hostAddress) {
         System.setProperty("javax.net.ssl.keyStore", "server.ks");
         System.setProperty("javax.net.ssl.keyStorePassword", "server");
         System.setProperty("javax.net.ssl.keyStoreType", "JKS");
         System.out.println("Waiting for connection...");
         connectionHandler = new ConnectionHandler(this);
         connectionHandler.start();
-        device = new Device(connectionHandler.getDeviceName(), "1.2.3.4", Integer.parseInt(connectionHandler.getPort()), "Available", System.getProperty("os.name"));
+        device = new Device(connectionHandler.getDeviceName(), hostAddress, Integer.parseInt(connectionHandler.getPort()), "Available", System.getProperty("os.name"));
         discovery = new Discovery(device);
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
