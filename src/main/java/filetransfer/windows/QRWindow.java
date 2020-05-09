@@ -17,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class QRWindow {
@@ -36,10 +37,10 @@ public class QRWindow {
         Pane root = new Pane();
         Scene scene = new Scene(root, 350, 350);
         root.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.rgb(255, 255, 255), CornerRadii.EMPTY, Insets.EMPTY)));
-
+        Color gBlue = new Color(66,133,244);
         Label deviceName = new Label();
         deviceName.setAlignment(Pos.CENTER);
-        deviceName.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
+        deviceName.setFont(Font.font("System", FontWeight.BOLD, 14));
         deviceName.setText(currentDeviceName);
         deviceName.setMinWidth(350);
         deviceName.setLayoutY(10);
@@ -47,7 +48,7 @@ public class QRWindow {
 
         Label guideMessage = new Label();
         guideMessage.setAlignment(Pos.CENTER);
-        guideMessage.setFont(Font.font("Verdana", FontWeight.BOLD, 11));
+        guideMessage.setFont(Font.font("System", FontWeight.BOLD, 13));
         guideMessage.setText("Scan the QR Code using the Android application");
         guideMessage.setMinWidth(350);
         guideMessage.setLayoutY(330);

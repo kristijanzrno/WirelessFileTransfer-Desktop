@@ -10,67 +10,57 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="564.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="filetransfer.controllers.MainController" fx:id="mainWindow">
+<VBox fx:id="mainWindow" prefHeight="564.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="filetransfer.controllers.MainController">
     <children>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="460.0" prefWidth="742.0" VBox.vgrow="ALWAYS">
             <children>
-                <Pane layoutY="-2.0" prefHeight="66.0" prefWidth="813.0"
-                      style="-fx-background-color: rgb(255,255,255);">
+                <Pane fx:id="toolbar" layoutY="-2.0" prefHeight="66.0" prefWidth="813.0" style="-fx-background-color: rgb(255,255,255);">
                     <children>
-                        <Label id="test" fx:id="deviceInfo" alignment="TOP_LEFT" contentDisplay="TOP" layoutX="14.0"
-                               layoutY="23.0" text="Device-Info">
+                        <Label id="test" fx:id="deviceInfo" alignment="TOP_LEFT" contentDisplay="TOP" layoutX="14.0" layoutY="23.0" text="Device-Info" textFill="#4285f4">
                             <opaqueInsets>
-                                <Insets left="50.0"/>
+                                <Insets left="50.0" />
                             </opaqueInsets>
                             <font>
-                                <Font name="System Font" size="16.0"/>
+                                <Font size="18.0" />
                             </font>
                         </Label>
-                        <Label id="status" fx:id="deviceStatus" layoutX="325.0" layoutY="23.0"
-                               text="Waiting for connection...">
+                        <Label id="status" fx:id="deviceStatus" alignment="CENTER" layoutX="10.0" layoutY="23.0" prefHeight="23.0" prefWidth="801.0" text="Waiting for connection..." textAlignment="CENTER" textFill="#4285f4">
                             <font>
-                                <Font name="System Bold Italic" size="16.0"/>
+                                <Font name="System Bold Italic" size="18.0" />
                             </font>
                         </Label>
-                        <Button layoutX="691.0" layoutY="8.0" mnemonicParsing="false" onAction="#onQRButtonClicked"
-                                style="-fx-background-color: #FFFFFF;" textFill="WHITE">
+                        <Button layoutX="691.0" layoutY="8.0" mnemonicParsing="false" onAction="#onQRButtonClicked" style="-fx-background-color: #FFFFFF;" textFill="WHITE">
                             <graphic>
                                 <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@qr.png"/>
+                                        <Image url="@qr.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button layoutX="745.0" layoutY="9.0" mnemonicParsing="false"
-                                onAction="#onSettingsButtonClicked" style="-fx-background-color: #FFFFFF;">
+                        <Button layoutX="745.0" layoutY="9.0" mnemonicParsing="false" onAction="#onSettingsButtonClicked" style="-fx-background-color: #FFFFFF;">
                             <graphic>
                                 <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@settings.png"/>
+                                        <Image url="@settings.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button fx:id="disconnectButton" layoutX="637.0" layoutY="8.0" mnemonicParsing="false"
-                                onAction="#onDisconnectButtonClicked"
-                                style="-fx-background-color: #FFFFFF; -fx-border-color: #FFFFFF;">
+                        <Button fx:id="disconnectButton" layoutX="637.0" layoutY="8.0" mnemonicParsing="false" onAction="#onDisconnectButtonClicked" style="-fx-background-color: #FFFFFF; -fx-border-color: #FFFFFF;">
                             <graphic>
                                 <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@disconnect2.png"/>
+                                        <Image url="@disconnect.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
                     </children>
                 </Pane>
-                <Label fx:id="mainMessage" alignment="CENTER" layoutX="38.0" layoutY="245.0" prefHeight="66.0"
-                       prefWidth="748.0" style="&#10;" text="Connect with a device to start transferring files!"
-                       textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
+                <Label fx:id="mainMessage" alignment="CENTER" layoutX="38.0" layoutY="245.0" prefHeight="66.0" prefWidth="748.0" style="&#10;" text="Connect with a device to start transferring files!" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
                     <font>
-                        <Font size="18.0"/>
+                        <Font size="18.0" />
                     </font>
                 </Label>
             </children>

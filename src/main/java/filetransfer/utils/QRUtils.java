@@ -18,7 +18,8 @@ public class QRUtils {
             Graphics2D graphics2D = (Graphics2D) bufferedImage.getGraphics();
             graphics2D.setColor(Color.WHITE);
             graphics2D.fillRect(0, 0, width, height);
-            graphics2D.setColor(Color.BLACK);
+            Color gBlue = new Color(66,133,244);
+            graphics2D.setColor(gBlue);
 
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {

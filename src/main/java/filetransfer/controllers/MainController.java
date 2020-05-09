@@ -6,10 +6,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 
 public class MainController {
@@ -28,7 +31,10 @@ public class MainController {
     @FXML
     private Button disconnectButton;
     @FXML
+    private Pane toolbar;
+    @FXML
     private VBox mainWindow;
+
 
     private MainUIHandler uiHandler;
 
@@ -37,12 +43,12 @@ public class MainController {
             this.uiHandler = uiHandler;
             disconnectButton.setVisible(false);
             setupDragAndDrop();
+            addToolbarShadow();
         }
     }
 
-    public void setupDragAndDrop() {
+    private void setupDragAndDrop() {
         mainWindow.setOnDragOver(new EventHandler<DragEvent>() {
-
             @Override
             public void handle(DragEvent event) {
                 if (event.getGestureSource() != mainWindow && event.getDragboard().hasFiles()) {
@@ -63,6 +69,15 @@ public class MainController {
                 event.consume();
             }
         });
+    }
+
+    private void addToolbarShadow(){
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setRadius(5);
+        dropShadow.setOffsetX(0);
+        dropShadow.setOffsetY(1.5);
+        dropShadow.setColor(Color.color(0.8, 0.8, 0.8));
+        toolbar.setEffect(dropShadow);
     }
 
 
