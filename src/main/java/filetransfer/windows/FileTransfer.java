@@ -3,6 +3,7 @@ package filetransfer.windows;
 
 import filetransfer.Constants;
 import filetransfer.controllers.MainController;
+import filetransfer.customUI.Toast;
 import filetransfer.model.Device;
 import filetransfer.model.Message;
 import filetransfer.network.ConnectionHandler;
@@ -30,6 +31,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     private Device currentDevice, connectedDevice;
     private ConnectionHandler connectionHandler;
     private MainController mainController;
+    private Stage mainStage;
 
     private int noOfFiles = 0;
     private int finished = 0;
@@ -50,6 +52,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
             System.exit(0);
         });
         stage.show();
+        mainStage = stage;
         startServices();
     }
 
@@ -75,7 +78,6 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         onFileTransferStarted(files.size());
         connectionHandler.sendMessage(new Message.Builder().add(Constants.FILE_SEND_MESSAGE).add(files.size() + "").build());
         for (File file : files) {
-            System.out.println("Sending file " + file.getName());
             connectionHandler.sendFile(new Message.Builder().add(Constants.FILE_NAME_MESSAGE).add(file.getName()).add(file.length() + "").add(file.getAbsolutePath()).build(), file.getAbsolutePath());
         }
     }
@@ -93,6 +95,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
         mainController.setDeviceInfo(currentDevice);
+        Toast.makeText(mainStage, "Successfully transferred all files!", 1000, 200, 200);
 
     }
 
@@ -124,16 +127,18 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         if (increase)
             finished++;
         Platform.runLater(() -> {
+            mainController.setTransferTitle("Transferring files...");
             mainController.setTransferDescription(finished + "/" + noOfFiles + " Files Transferred...");
             if (noOfFiles == finished) {
                 if (hadErrors) {
-                    //todo had some errors
+                    Toast.makeText(mainStage, "Some files could not be transferred.", 1000, 200, 200);
                 } else {
-                    // todo message = success
+                    Toast.makeText(mainStage, "Successfully transferred all files!", 1000, 200, 200);
                     mainController.setTransferDescription("Drag and drop files to transfer them to the Android device!");
+                    mainController.setTransferTitle("Waiting for files...");
                 }
                 noOfFiles = finished = 0;
-                //todo spinner dismiss
+                mainController.activateProgressIndicator(true);
             }
         });
     }
@@ -162,6 +167,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         this.hadErrors = false;
         this.noOfFiles = noOfFiles;
         updateStatus(false);
+        mainController.activateProgressIndicator(false);
     }
 
     @Override
@@ -179,6 +185,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     public void onReceivingFiles(int noOfFiles) {
         this.noOfFiles = noOfFiles;
         updateStatus(false);
+        mainController.activateProgressIndicator(false);
     }
 
     @Override

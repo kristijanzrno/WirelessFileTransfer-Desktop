@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -43,7 +44,8 @@ public class MainController {
     private Label transferDescription;
     @FXML
     private ImageView folderImage;
-
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     private MainUIHandler uiHandler;
 
@@ -76,13 +78,18 @@ public class MainController {
 
     private void setupUI(){
         transferPane.setVisible(false);
+        progressIndicator.setVisible(false);
         addToolbarShadow();
     }
 
     private void updateUI(boolean connected){
         mainMessage.setVisible(!connected);
         transferPane.setVisible(connected);
+    }
 
+    public void activateProgressIndicator(boolean finished){
+        folderImage.setVisible(finished);
+        progressIndicator.setVisible(!finished);
     }
 
     private void addToolbarShadow(){
@@ -95,9 +102,9 @@ public class MainController {
     }
 
 
-    /*public void setMainMessage(String message) {
+    public void setMainMessage(String message) {
         this.mainMessage.setText(message);
-    }*/
+    }
 
     public void setDeviceInfo(Device device) {
         this.deviceInfo.setText(device.getName());
@@ -111,6 +118,10 @@ public class MainController {
 
     public void setTransferDescription(String text){
         this.transferDescription.setText(text);
+    }
+
+    public void setTransferTitle(String text){
+        this.transferTitle.setText(text);
     }
     @FXML
     private void onQRButtonClicked() {
