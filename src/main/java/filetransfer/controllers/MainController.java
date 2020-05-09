@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -34,6 +35,14 @@ public class MainController {
     private Pane toolbar;
     @FXML
     private VBox mainWindow;
+    @FXML
+    private Pane transferPane;
+    @FXML
+    private Label transferTitle;
+    @FXML
+    private Label transferDescription;
+    @FXML
+    private ImageView folderImage;
 
 
     private MainUIHandler uiHandler;
@@ -43,32 +52,37 @@ public class MainController {
             this.uiHandler = uiHandler;
             disconnectButton.setVisible(false);
             setupDragAndDrop();
-            addToolbarShadow();
+            setupUI();
         }
     }
 
     private void setupDragAndDrop() {
-        mainWindow.setOnDragOver(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                if (event.getGestureSource() != mainWindow && event.getDragboard().hasFiles()) {
-                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                }
-                event.consume();
+        mainWindow.setOnDragOver(event -> {
+            if (event.getGestureSource() != mainWindow && event.getDragboard().hasFiles()) {
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
+            event.consume();
         });
 
-        mainWindow.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                Dragboard db = event.getDragboard();
-                if (db.hasFiles()) {
-                    uiHandler.onFilesDraggedIn(db.getFiles());
-                }
-                event.setDropCompleted(true);
-                event.consume();
+        mainWindow.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasFiles()) {
+                uiHandler.onFilesDraggedIn(db.getFiles());
             }
+            event.setDropCompleted(true);
+            event.consume();
         });
+    }
+
+    private void setupUI(){
+        transferPane.setVisible(false);
+        addToolbarShadow();
+    }
+
+    private void updateUI(boolean connected){
+        mainMessage.setVisible(!connected);
+        transferPane.setVisible(connected);
+
     }
 
     private void addToolbarShadow(){
@@ -81,9 +95,9 @@ public class MainController {
     }
 
 
-    public void setMainMessage(String message) {
+    /*public void setMainMessage(String message) {
         this.mainMessage.setText(message);
-    }
+    }*/
 
     public void setDeviceInfo(Device device) {
         this.deviceInfo.setText(device.getName());
@@ -92,8 +106,12 @@ public class MainController {
     public void setDeviceStatus(boolean connected, String deviceName) {
         this.deviceStatus.setText(connected ? "Connected to " + deviceName : "Waiting for connection...");
         this.disconnectButton.setVisible(connected);
+        updateUI(connected);
     }
 
+    public void setTransferDescription(String text){
+        this.transferDescription.setText(text);
+    }
     @FXML
     private void onQRButtonClicked() {
         uiHandler.onQRButtonClicked();

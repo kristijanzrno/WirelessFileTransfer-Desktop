@@ -124,13 +124,13 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         if (increase)
             finished++;
         Platform.runLater(() -> {
-            mainController.setMainMessage(finished + "/" + noOfFiles + "Files Transferred...");
+            mainController.setTransferDescription(finished + "/" + noOfFiles + " Files Transferred...");
             if (noOfFiles == finished) {
                 if (hadErrors) {
                     //todo had some errors
                 } else {
                     // todo message = success
-                    mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
+                    mainController.setTransferDescription("Drag and drop files to transfer them to the Android device!");
                 }
                 noOfFiles = finished = 0;
                 //todo spinner dismiss
@@ -140,13 +140,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
 
     @Override
     public void onDeviceConnected() {
-        if (connectedDevice != null) {
-            Platform.runLater(() -> {
-                mainController.setDeviceStatus(true, connectedDevice.getName());
-                mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
-            });
-
-        }
+        mainController.setDeviceStatus(true, connectedDevice.getName());
     }
 
     @Override
@@ -157,7 +151,6 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     @Override
     public void onConnectionTerminated() {
         mainController.setDeviceStatus(false, "");
-        mainController.setMainMessage("Connect with a device to start transferring files!");
         connectedDevice = null;
         noOfFiles = finished = 0;
         hadErrors = false;
