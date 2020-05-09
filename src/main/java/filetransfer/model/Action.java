@@ -1,4 +1,4 @@
-package filetransfer;
+package filetransfer.model;
 
 
 public class Action {

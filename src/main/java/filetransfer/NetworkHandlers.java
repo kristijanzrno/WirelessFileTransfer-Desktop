@@ -1,5 +1,7 @@
 package filetransfer;
 
+import filetransfer.model.Device;
+
 public interface NetworkHandlers {
     void onConnectionAttempted(Device device);
 

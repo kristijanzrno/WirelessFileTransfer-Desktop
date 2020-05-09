@@ -1,4 +1,6 @@
-package filetransfer;
+package filetransfer.model;
+
+import filetransfer.Constants;
 
 import java.util.Arrays;
 

@@ -1,6 +1,6 @@
 package filetransfer.controllers;
 
-import filetransfer.Device;
+import filetransfer.model.Device;
 import filetransfer.MainUIHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

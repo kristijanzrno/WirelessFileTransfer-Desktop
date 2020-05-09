@@ -1,4 +1,4 @@
-package filetransfer;
+package filetransfer.model;
 
 import java.io.Serializable;
 

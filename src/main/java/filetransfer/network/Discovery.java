@@ -1,4 +1,8 @@
-package filetransfer;
+package filetransfer.network;
+
+import filetransfer.Constants;
+import filetransfer.model.Device;
+import filetransfer.model.Message;
 
 import java.net.*;
 

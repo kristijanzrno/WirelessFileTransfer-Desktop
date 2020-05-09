@@ -1,4 +1,4 @@
-package filetransfer;
+package filetransfer.utils;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;

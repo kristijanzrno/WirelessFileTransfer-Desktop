@@ -1,4 +1,9 @@
-package filetransfer;
+package filetransfer.network;
+
+import filetransfer.*;
+import filetransfer.model.Action;
+import filetransfer.model.Device;
+import filetransfer.model.Message;
 
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;

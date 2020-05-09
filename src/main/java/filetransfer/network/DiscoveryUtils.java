@@ -1,4 +1,4 @@
-package filetransfer;
+package filetransfer.network;
 
 public interface DiscoveryUtils {
 

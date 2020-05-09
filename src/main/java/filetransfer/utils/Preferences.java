@@ -1,5 +1,7 @@
-package filetransfer;
+package filetransfer.utils;
 
+
+import filetransfer.Constants;
 
 public class Preferences {
     private String imagesPath = "Default";

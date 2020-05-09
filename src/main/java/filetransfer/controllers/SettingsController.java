@@ -1,6 +1,6 @@
 package filetransfer.controllers;
 
-import filetransfer.Preferences;
+import filetransfer.utils.Preferences;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;

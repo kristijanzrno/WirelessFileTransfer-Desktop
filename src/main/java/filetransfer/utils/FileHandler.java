@@ -1,4 +1,4 @@
-package filetransfer;
+package filetransfer.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
