@@ -34,10 +34,8 @@ public final class Toast {
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
         toastStage.setScene(scene);
-        toastStage.setX(ownerStage.getX() + (ownerStage.getWidth())/2 - 160);
-        toastStage.setY(ownerStage.getY() + ownerStage.getHeight()/2 + 130);
         toastStage.show();
-
+        toastStage.setY(ownerStage.getY() + ownerStage.getHeight()/2 + 130);
         Timeline fadeInTimeline = new Timeline();
         KeyFrame fadeInKey1 = new KeyFrame(Duration.millis(fadeInDelay), new KeyValue(toastStage.getScene().getRoot().opacityProperty(), 1));
         fadeInTimeline.getKeyFrames().add(fadeInKey1);

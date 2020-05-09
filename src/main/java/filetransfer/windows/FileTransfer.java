@@ -13,11 +13,9 @@ import filetransfer.network.NetworkHandlers;
 import filetransfer.utils.Preferences;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.DragEvent;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -69,8 +67,11 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
 
     @Override
     public void onDisconnectButtonClicked() {
-        //todo ask first
-        connectionHandler.terminateConnection();
+        Platform.runLater(() -> {
+            if (Alerts.yesNoAlert("Terminate Connection", "Do you really want to terminate the connection?")) {
+                connectionHandler.terminateConnection();
+            }
+        });
     }
 
     @Override
@@ -95,8 +96,6 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
         mainController.setDeviceInfo(currentDevice);
-        Toast.makeText(mainStage, "Successfully transferred all files!", 1000, 200, 200);
-
     }
 
     @Override
@@ -160,6 +159,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         noOfFiles = finished = 0;
         hadErrors = false;
         status = false;
+        Toast.makeText(mainStage, "Lost connection...", 1000, 200, 200);
     }
 
     @Override
