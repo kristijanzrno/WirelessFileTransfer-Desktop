@@ -1,37 +1,26 @@
 package filetransfer.windows;
 
 
-import filetransfer.*;
+import filetransfer.Constants;
 import filetransfer.controllers.MainController;
-import filetransfer.controllers.SettingsController;
 import filetransfer.model.Device;
 import filetransfer.model.Message;
 import filetransfer.network.ConnectionHandler;
 import filetransfer.network.Discovery;
 import filetransfer.network.DiscoveryUtils;
+import filetransfer.network.NetworkHandlers;
 import filetransfer.utils.Preferences;
-import filetransfer.utils.QRUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.input.DragEvent;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
-import java.awt.image.BufferedImage;
-import java.util.Optional;
+import java.io.File;
+import java.util.List;
 
 public class FileTransfer extends Application implements MainUIHandler, DiscoveryUtils, NetworkHandlers {
 
@@ -79,6 +68,16 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     public void onDisconnectButtonClicked() {
         //todo ask first
         connectionHandler.terminateConnection();
+    }
+
+    @Override
+    public void onFilesDraggedIn(List<File> files) {
+        onFileTransferStarted(files.size());
+        connectionHandler.sendMessage(new Message.Builder().add(Constants.FILE_SEND_MESSAGE).add(files.size() + "").build());
+        for (File file : files) {
+            System.out.println("Sending file " + file.getName());
+            connectionHandler.sendFile(new Message.Builder().add(Constants.FILE_NAME_MESSAGE).add(file.getName()).add(file.length() + "").add(file.getAbsolutePath()).build(), file.getAbsolutePath());
+        }
     }
 
 

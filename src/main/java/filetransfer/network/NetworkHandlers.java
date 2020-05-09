@@ -1,4 +1,4 @@
-package filetransfer;
+package filetransfer.network;
 
 import filetransfer.model.Device;
 

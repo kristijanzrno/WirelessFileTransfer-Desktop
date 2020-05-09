@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 
 <VBox prefHeight="564.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="filetransfer.controllers.MainController">
+      fx:controller="filetransfer.controllers.MainController" fx:id="mainWindow">
     <children>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="460.0" prefWidth="742.0" VBox.vgrow="ALWAYS">
             <children>
