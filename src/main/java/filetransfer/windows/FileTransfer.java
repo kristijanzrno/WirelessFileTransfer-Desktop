@@ -14,6 +14,7 @@ import filetransfer.utils.QRUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -27,9 +28,9 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.awt.image.BufferedImage;
-import java.net.Inet4Address;
 import java.util.Optional;
 
 public class FileTransfer extends Application implements MainUIHandler, DiscoveryUtils, NetworkHandlers {
@@ -40,7 +41,6 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     private Device currentDevice, connectedDevice;
     private ConnectionHandler connectionHandler;
     private MainController mainController;
-    private SettingsController settingsController;
 
     private int noOfFiles = 0;
     private int finished = 0;
@@ -56,68 +56,23 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         stage.setTitle("Wireless File Transfer");
         stage.setScene(new Scene(root, 810, 550));
         stage.setResizable(false);
+        stage.setOnCloseRequest(windowEvent -> {
+            Platform.exit();
+            System.exit(0);
+        });
         stage.show();
-        String address = Inet4Address.getLocalHost().getHostAddress();
-        System.out.println(address);
-        System.out.println(Inet4Address.getLocalHost());
-        startServices(address);
+        startServices();
     }
 
     @Override
     public void onQRButtonClicked() {
-        String message = new Message.Builder().add(currentDevice.getName()).add(currentDevice.getIp()).add(currentDevice.getPort() + "").add(currentDevice.getAvailable()).add(currentDevice.getInfo()).build();
-        BufferedImage bufferedImage = QRUtils.generateQRCode(message, 300, 300);
-        if (bufferedImage != null) {
-            Stage stage = new Stage();
-            stage.setTitle("QR Code");
-            stage.setResizable(false);
-            Pane root = new Pane();
-            Scene scene = new Scene(root, 350, 350);
-            root.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.rgb(255, 255, 255), CornerRadii.EMPTY, Insets.EMPTY)));
-
-            Label deviceName = new Label();
-            deviceName.setAlignment(Pos.CENTER);
-            deviceName.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
-            deviceName.setText(currentDevice.getName());
-            deviceName.setMinWidth(350);
-            deviceName.setLayoutY(10);
-            root.getChildren().add(deviceName);
-
-            Label guideMessage = new Label();
-            guideMessage.setAlignment(Pos.CENTER);
-            guideMessage.setFont(Font.font("Verdana", FontWeight.BOLD, 11));
-            guideMessage.setText("Scan the QR Code using the Android application");
-            guideMessage.setMinWidth(350);
-            guideMessage.setLayoutY(330);
-            root.getChildren().add(guideMessage);
-
-            ImageView imageView = new ImageView();
-            imageView.setLayoutX(25);
-            imageView.setLayoutY(25);
-            imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-            root.getChildren().add(imageView);
-
-            stage.setScene(scene);
-            stage.show();
-        }
+        if (currentDevice != null)
+            new QRWindow(currentDevice);
     }
 
     @Override
     public void onSettingsButtonClicked() {
-        try {
-            System.out.println("Settings");
-            Stage stage = new Stage();
-            stage.setTitle("Settings");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/settings.fxml"));
-            Parent root = loader.load();
-            settingsController = loader.getController();
-            settingsController.initStage(stage, preferences);
-            stage.setScene(new Scene(root, 590, 600));
-            stage.setResizable(false);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new SettingsWindow(preferences);
     }
 
     @Override
@@ -127,11 +82,10 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     }
 
 
-    private void startServices(String hostAddress) {
+    private void startServices() {
         System.setProperty("javax.net.ssl.keyStore", "server.ks");
         System.setProperty("javax.net.ssl.keyStorePassword", "server");
         System.setProperty("javax.net.ssl.keyStoreType", "JKS");
-        System.out.println("Waiting for connection...");
         connectionHandler = new ConnectionHandler(this);
         connectionHandler.start();
         currentDevice = new Device(connectionHandler.getDeviceName(), connectionHandler.getIPAddress(), Integer.parseInt(connectionHandler.getPort()), "Available", System.getProperty("os.name"));
@@ -153,22 +107,14 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     public void onConnectionAttempted(Device request) {
         if (!status) {
             status = true;
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Connection Request");
-                    alert.setContentText(request.getName() + " wants to connect...");
-
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() == ButtonType.OK) {
-                        connectionHandler.acceptConnection();
-                        connectedDevice = request;
-                        onDeviceConnected();
-                    } else {
-                        connectionHandler.refuseConnection();
-                        status = false;
-                    }
+            Platform.runLater(() -> {
+                if (Alerts.yesNoAlert("Connection Request", request.getName() + " wants to connect...")) {
+                    connectionHandler.acceptConnection();
+                    connectedDevice = request;
+                    onDeviceConnected();
+                } else {
+                    connectionHandler.refuseConnection();
+                    status = false;
                 }
             });
         }
@@ -178,20 +124,17 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     private void updateStatus(boolean increase) {
         if (increase)
             finished++;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                mainController.setMainMessage(finished + "/" + noOfFiles + "Files Transferred...");
-                if (noOfFiles == finished) {
-                    if (hadErrors) {
-                        //todo had some errors
-                    } else {
-                        // todo message = success
-                        mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
-                    }
-                    noOfFiles = finished = 0;
-                    //todo spinner dismiss
+        Platform.runLater(() -> {
+            mainController.setMainMessage(finished + "/" + noOfFiles + "Files Transferred...");
+            if (noOfFiles == finished) {
+                if (hadErrors) {
+                    //todo had some errors
+                } else {
+                    // todo message = success
+                    mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
                 }
+                noOfFiles = finished = 0;
+                //todo spinner dismiss
             }
         });
     }
@@ -199,12 +142,9 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     @Override
     public void onDeviceConnected() {
         if (connectedDevice != null) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    mainController.setDeviceStatus(true, connectedDevice.getName());
-                    mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
-                }
+            Platform.runLater(() -> {
+                mainController.setDeviceStatus(true, connectedDevice.getName());
+                mainController.setMainMessage("Drag and drop files to transfer them to the Android device!");
             });
 
         }

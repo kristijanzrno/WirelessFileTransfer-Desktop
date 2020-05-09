@@ -2,10 +2,6 @@ package filetransfer;
 
 public class Constants {
     // DESKTOP SPECIFIC CONSTANTS
-
-    public static final int FILE_PICKER_REQUEST = 4;
-    public static final int FILE_TRANSFER_ACTIVITY_REQUEST = 5;
-
     public static final String FILE_SEND_MESSAGE = "_transferring";
     public static final String FILE_NAME_MESSAGE = "_filename";
     public static final String FILE_RECEIVED = "_received";
@@ -21,7 +17,13 @@ public class Constants {
     public static final String DISCOVERY_BROADCAST = "discovery@";
     public static final String DEVICE_DISCOVERED = "_disc";
 
+    public static final int[] DESKTOP_DISCOVERY_PORTS = {51423, 49324, 60321, 52300};
+
     // ANDROID SPECIFIC CONSTANTS
+
+    public static final int FILE_PICKER_REQUEST = 4;
+    public static final int FILE_TRANSFER_ACTIVITY_REQUEST = 5;
+
     // Network Broadcasts
     public static final int BROADCAST_WAIT_TIME = 3000;
     // Shared Preferences Keys

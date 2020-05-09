@@ -17,7 +17,6 @@ import java.util.Queue;
 public class ConnectionHandler extends Thread {
     private ServerSocket serverSocket;
     private Socket androidDevice;
-    private int port = 9270;
     private boolean isRunning = true;
     private NetworkHandlers networkHandlers;
 
@@ -31,16 +30,22 @@ public class ConnectionHandler extends Thread {
     public ConnectionHandler(NetworkHandlers networkHandlers) {
         this.networkHandlers = networkHandlers;
         this.actions = new LinkedList<>();
-        createSocket();
+        createSocket(49152);
     }
 
-    private void createSocket() {
+    private void createSocket(int port) {
         try {
             SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
             serverSocket = sslServerSocketFactory.createServerSocket(port);
         } catch (IOException e) {
-            e.printStackTrace();
-            isRunning = false;
+            if (port <= 65535) {
+                // Try the next port in range(449152 - 65535) until one is available
+                createSocket(port + 1);
+            } else {
+                e.printStackTrace();
+                isRunning = false;
+            }
+
         }
     }
 
@@ -97,7 +102,8 @@ public class ConnectionHandler extends Thread {
                             networkHandlers.onFileTransferFailed(receivedMessage.paramAt(0));
                             break;
                         case Constants.CONNECTION_TERMINATOR:
-                            stopConnection();
+                            terminateConnection();
+                            //stopConnection();
                             break;
                         case Constants.CONNECTION_REQUEST:
                             //todo accept/refuse
@@ -197,11 +203,11 @@ public class ConnectionHandler extends Thread {
         return true;
     }
 
-    public void stopConnection() {
+    /*public void stopConnection() {
         sendMessage(Constants.CONNECTION_TERMINATOR);
         isRunning = false;
-        createSocket();
-    }
+        createSocket(49152);
+    }*/
 
     public void terminateConnection() {
         sendMessage(Constants.CONNECTION_TERMINATOR);
@@ -247,7 +253,8 @@ public class ConnectionHandler extends Thread {
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                stopConnection();
+                terminateConnection();
+                //stopConnection();
             }
         });
     }

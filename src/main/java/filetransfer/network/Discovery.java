@@ -10,6 +10,7 @@ public class Discovery implements Runnable {
 
     private boolean isRunning = true;
     private Device device;
+    private DatagramSocket socket;
 
     public Discovery(Device device) {
         this.device = device;
@@ -18,8 +19,7 @@ public class Discovery implements Runnable {
     @Override
     public void run() {
         try {
-            DatagramSocket socket = new DatagramSocket(8899, InetAddress.getByName("0.0.0.0"));
-            socket.setBroadcast(true);
+            createSocket(0);
             while (isRunning) {
                 byte[] receiveBuffer = new byte[15000];
                 DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
@@ -39,6 +39,22 @@ public class Discovery implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void createSocket(int counter) {
+        try {
+            socket = new DatagramSocket(Constants.DESKTOP_DISCOVERY_PORTS[counter], InetAddress.getByName("0.0.0.0"));
+            socket.setBroadcast(true);
+        } catch (Exception e) {
+            if (counter > 3) {
+                e.printStackTrace();
+                isRunning = false;
+                // todo notify user about busy ports
+            } else {
+                createSocket(counter + 1);
+            }
+        }
+
     }
 
     public void stopRunning() {
