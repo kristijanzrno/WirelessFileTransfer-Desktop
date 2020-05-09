@@ -51,6 +51,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         });
         stage.show();
         mainStage = stage;
+        preferences = new Preferences();
         startServices();
     }
 
@@ -88,11 +89,10 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         System.setProperty("javax.net.ssl.keyStore", "server.ks");
         System.setProperty("javax.net.ssl.keyStorePassword", "server");
         System.setProperty("javax.net.ssl.keyStoreType", "JKS");
-        connectionHandler = new ConnectionHandler(this);
+        connectionHandler = new ConnectionHandler(this, preferences);
         connectionHandler.start();
         currentDevice = new Device(connectionHandler.getDeviceName(), connectionHandler.getIPAddress(), Integer.parseInt(connectionHandler.getPort()), "Available", System.getProperty("os.name"));
-        discovery = new Discovery(currentDevice);
-        preferences = new Preferences();
+        discovery = new Discovery(currentDevice, this);
         Thread discoveryThread = new Thread(discovery);
         discoveryThread.start();
         mainController.setDeviceInfo(currentDevice);
@@ -154,12 +154,17 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
 
     @Override
     public void onConnectionTerminated() {
-        mainController.setDeviceStatus(false, "");
         connectedDevice = null;
         noOfFiles = finished = 0;
         hadErrors = false;
         status = false;
-        Toast.makeText(mainStage, "Lost connection...", 1000, 200, 200);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                mainController.setDeviceStatus(false, "");
+                Toast.makeText(mainStage, "Lost connection...", 1000, 200, 200);
+            }
+        });
     }
 
     @Override
@@ -192,6 +197,13 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
     public void onFileReceived() {
         updateStatus(true);
 
+    }
+
+    @Override
+    public void noDiscoveryPortsAvailable() {
+        Platform.runLater(() -> {
+            Alerts.okAlert("No ports available.", "The discovery feature can not work because all the device ports are busy. Please use the QR feature.");
+        });
     }
 
     public static void main(String[] args) {

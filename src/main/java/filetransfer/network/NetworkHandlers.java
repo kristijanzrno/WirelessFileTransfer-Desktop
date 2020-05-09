@@ -20,4 +20,6 @@ public interface NetworkHandlers {
     void onReceivingFiles(int noOfFiles);
 
     void onFileReceived();
+
+    void noDiscoveryPortsAvailable();
 }

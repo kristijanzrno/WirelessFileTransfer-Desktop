@@ -11,9 +11,11 @@ public class Discovery implements Runnable {
     private boolean isRunning = true;
     private Device device;
     private DatagramSocket socket;
+    private NetworkHandlers networkHandlers;
 
-    public Discovery(Device device) {
+    public Discovery(Device device, NetworkHandlers networkhandlers) {
         this.device = device;
+        this.networkHandlers = networkhandlers;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class Discovery implements Runnable {
             if (counter > 3) {
                 e.printStackTrace();
                 isRunning = false;
-                // todo notify user about busy ports
+                networkHandlers.noDiscoveryPortsAvailable();
             } else {
                 createSocket(counter + 1);
             }

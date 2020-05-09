@@ -4,6 +4,8 @@ import filetransfer.*;
 import filetransfer.model.Action;
 import filetransfer.model.Device;
 import filetransfer.model.Message;
+import filetransfer.utils.FileHandler;
+import filetransfer.utils.Preferences;
 
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
@@ -19,6 +21,7 @@ public class ConnectionHandler extends Thread {
     private Socket androidDevice;
     private boolean isRunning = true;
     private NetworkHandlers networkHandlers;
+    private Preferences preferences;
 
     DataInputStream input = null;
     DataOutputStream output = null;
@@ -27,9 +30,10 @@ public class ConnectionHandler extends Thread {
 
     private boolean test = true;
 
-    public ConnectionHandler(NetworkHandlers networkHandlers) {
+    public ConnectionHandler(NetworkHandlers networkHandlers, Preferences preferences) {
         this.networkHandlers = networkHandlers;
         this.actions = new LinkedList<>();
+        this.preferences = preferences;
         createSocket(49152);
     }
 
@@ -90,7 +94,7 @@ public class ConnectionHandler extends Thread {
                             String filename = receivedMessage.paramAt(0);
                             long fileSize = Long.parseLong(receivedMessage.paramAt(1));
                             System.out.println("Receiving " + filename + "...");
-                            if (!receiveFile(filename, fileSize, input)) {
+                            if (!FileHandler.writeFile(filename, fileSize, input, preferences)) {
                                 sendMessage(new Message.Builder().add(Constants.FILE_TRANSFER_ERROR).add(filename).build());
                                 networkHandlers.onFileTransferFailed(filename);
                             } else {
@@ -106,11 +110,8 @@ public class ConnectionHandler extends Thread {
                             break;
                         case Constants.CONNECTION_TERMINATOR:
                             isRunning = false;
-                            //terminateConnection();
-                            //stopConnection();
                             break;
                         case Constants.CONNECTION_REQUEST:
-                            //todo accept/refuse
                             Device device = new Device();
                             device.setName(receivedMessage.paramAt(0));
                             networkHandlers.onConnectionAttempted(device);
@@ -133,7 +134,9 @@ public class ConnectionHandler extends Thread {
                                 break;
                             case "send_file":
                                 writeMessage(action.getMessage());
-                                writeFile(action.getFilePath());
+                                if (!FileHandler.readFile(action.getFilePath(), output)) {
+                                    sendMessage(new Message.Builder().add(Constants.FILE_TRANSFER_ERROR).add(action.getFilePath()).build());
+                                }
                                 break;
                         }
                     } else {
@@ -161,7 +164,7 @@ public class ConnectionHandler extends Thread {
         output.writeUTF(message);
     }
 
-    private void writeFile(String filePath) {
+    /*private void writeFile(String filePath) {
         System.out.println("sending...");
         try {
             File file = new File(filePath);
@@ -181,7 +184,7 @@ public class ConnectionHandler extends Thread {
             e.printStackTrace();
         }
 
-    }
+    }*/
 
 
     private Message receiveMessage() throws IOException {
@@ -191,7 +194,7 @@ public class ConnectionHandler extends Thread {
         return null;
     }
 
-    private boolean receiveFile(String filename, long fileSize, InputStream inputStream) {
+/*    private boolean receiveFile(String filename, long fileSize, InputStream inputStream) {
         File file = new File(filename);
         System.out.println("receiving....");
         try {
@@ -211,13 +214,8 @@ public class ConnectionHandler extends Thread {
         }
         System.out.println("done....");
         return true;
-    }
+    }*/
 
-    public void resetSocket() {
-        //sendMessage(Constants.CONNECTION_TERMINATOR);
-        isRunning = false;
-        createSocket(49152);
-    }
 
     public void terminateConnection() {
         sendMessage(Constants.CONNECTION_TERMINATOR);

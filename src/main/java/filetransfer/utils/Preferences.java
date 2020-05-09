@@ -4,6 +4,7 @@ package filetransfer.utils;
 import filetransfer.Constants;
 
 public class Preferences {
+    private static final String default_dir = System.getProperty("user.home") + "/Desktop/Transferred";
     private String imagesPath = "Default";
     private String audioPath = "Default";
     private String videosPath = "Default";
@@ -39,7 +40,9 @@ public class Preferences {
 
 
     public String getImagesPath() {
-        return imagesPath;
+        if (this.imagesPath.equals("Default"))
+            return default_dir + "/Images/";
+        else return this.imagesPath;
     }
 
     public void setImagesPath(String imagesPath) {
@@ -47,7 +50,9 @@ public class Preferences {
     }
 
     public String getAudioPath() {
-        return audioPath;
+        if (this.audioPath.equals("Default"))
+            return default_dir + "/Audio/";
+        else return this.audioPath;
     }
 
     public void setAudioPath(String audioPath) {
@@ -55,7 +60,9 @@ public class Preferences {
     }
 
     public String getVideosPath() {
-        return videosPath;
+        if (this.videosPath.equals("Default"))
+            return default_dir + "/Videos/";
+        else return this.videosPath;
     }
 
     public void setVideosPath(String videosPath) {
@@ -63,7 +70,9 @@ public class Preferences {
     }
 
     public String getDocumentsPath() {
-        return documentsPath;
+        if (this.documentsPath.equals("Default"))
+            return default_dir + "/Documents/";
+        else return this.documentsPath;
     }
 
     public void setDocumentsPath(String documentsPath) {
@@ -71,7 +80,9 @@ public class Preferences {
     }
 
     public String getOtherPath() {
-        return otherPath;
+        if (this.otherPath.equals("Default"))
+            return default_dir + "/Other/";
+        else return this.otherPath;
     }
 
     public void setOtherPath(String otherPath) {
