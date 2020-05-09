@@ -154,6 +154,7 @@ public class FileTransfer extends Application implements MainUIHandler, Discover
         connectedDevice = null;
         noOfFiles = finished = 0;
         hadErrors = false;
+        status = false;
     }
 
     @Override

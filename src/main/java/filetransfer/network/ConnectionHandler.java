@@ -53,7 +53,9 @@ public class ConnectionHandler extends Thread {
     public void run() {
         while (true) {
             try {
+                System.out.println("waiting for connection......");
                 androidDevice = serverSocket.accept();
+                isRunning = true;
             } catch (IOException e) {
                 e.printStackTrace();
                 isRunning = false;
@@ -75,6 +77,7 @@ public class ConnectionHandler extends Thread {
                     receivedMessage = receiveMessage();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    isRunning = false;
                 }
 
                 if (receivedMessage != null) {
@@ -102,7 +105,8 @@ public class ConnectionHandler extends Thread {
                             networkHandlers.onFileTransferFailed(receivedMessage.paramAt(0));
                             break;
                         case Constants.CONNECTION_TERMINATOR:
-                            terminateConnection();
+                            isRunning = false;
+                            //terminateConnection();
                             //stopConnection();
                             break;
                         case Constants.CONNECTION_REQUEST:
@@ -120,6 +124,12 @@ public class ConnectionHandler extends Thread {
                         switch (action.getAction()) {
                             case "send_message":
                                 writeMessage(action.getMessage());
+                                if (action.getMessage().equals(Constants.CONNECTION_TERMINATOR)) {
+                                    System.out.println("WROTE TERMINATION");
+                                    isRunning = false;
+                                    //serverSocket.close();
+                                    //createSocket(49152);
+                                }
                                 break;
                             case "send_file":
                                 writeMessage(action.getMessage());
@@ -131,9 +141,9 @@ public class ConnectionHandler extends Thread {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-
                 }
             }
+            networkHandlers.onConnectionTerminated();
         }
     }
 
@@ -203,11 +213,11 @@ public class ConnectionHandler extends Thread {
         return true;
     }
 
-    /*public void stopConnection() {
-        sendMessage(Constants.CONNECTION_TERMINATOR);
+    public void resetSocket() {
+        //sendMessage(Constants.CONNECTION_TERMINATOR);
         isRunning = false;
         createSocket(49152);
-    }*/
+    }
 
     public void terminateConnection() {
         sendMessage(Constants.CONNECTION_TERMINATOR);
@@ -254,7 +264,6 @@ public class ConnectionHandler extends Thread {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 terminateConnection();
-                //stopConnection();
             }
         });
     }
