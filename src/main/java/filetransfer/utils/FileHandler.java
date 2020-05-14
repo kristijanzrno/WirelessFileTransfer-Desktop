@@ -32,10 +32,10 @@ public class FileHandler {
     }
 
     public static boolean writeFile(String filename, long fileSize, InputStream inputStream, Preferences preferences) {
-        File parentFolder = new File("./Transferred/");
+        File parentFolder = new File("./Transferred Files/");
         if (!parentFolder.exists())
             parentFolder.mkdir();
-        File file = new File("./Transferred/" + filename);
+        File file = new File("./Transferred Files/" + filename);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
